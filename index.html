@@ -1,0 +1,4180 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#030009">
+    <title>BLACK MAGE ∞</title>
+
+    <style>
+        /* =========================================================
+           BLACK MAGE INFINITE
+           CSS ENGINE
+           ========================================================= */
+
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Vazirmatn:wght@400;600;800;900&display=swap');
+
+        :root{
+            --void:#020106;
+            --purple:#a855ff;
+            --violet:#711cff;
+            --pink:#ff237f;
+            --cyan:#35eaff;
+            --gold:#ffd166;
+            --red:#ff315c;
+            --white:#ffffff;
+            --muted:#71697d;
+            --glass:rgba(255,255,255,.045);
+            --line:rgba(190,120,255,.16);
+        }
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        html{
+            scroll-behavior:smooth;
+            scroll-snap-type:y proximity;
+            background:var(--void);
+        }
+
+        body{
+            min-height:100vh;
+            overflow-x:hidden;
+            background:
+                    radial-gradient(
+                            circle at 50% 10%,
+                            #16042d 0,
+                            #05020b 35%,
+                            #010106 75%
+                    );
+            color:#fff;
+            font-family:"Vazirmatn",sans-serif;
+            cursor:none;
+        }
+
+        /* =========================================================
+           CANVASES
+           ========================================================= */
+
+        canvas{
+            position:fixed;
+            inset:0;
+            width:100%;
+            height:100%;
+            pointer-events:none;
+        }
+
+        #stars{
+            z-index:0;
+        }
+
+        #space{
+            z-index:1;
+        }
+
+        #particles{
+            z-index:40;
+        }
+
+        #effects{
+            z-index:45;
+        }
+
+        /* =========================================================
+           SCROLL PROGRESS
+           ========================================================= */
+
+        #progress{
+            position:fixed;
+            z-index:9999;
+            top:0;
+            right:0;
+            width:5px;
+            height:0%;
+            background:
+                    linear-gradient(
+                            180deg,
+                            var(--cyan),
+                            var(--purple),
+                            var(--pink)
+                    );
+            box-shadow:
+                    0 0 15px var(--purple),
+                    0 0 35px var(--pink);
+        }
+
+        /* =========================================================
+           CURSOR
+           ========================================================= */
+
+        #cursor{
+            position:fixed;
+            z-index:10000;
+            width:20px;
+            height:20px;
+            border:1px solid #d7a5ff;
+            border-radius:50%;
+            transform:translate(-50%,-50%);
+            pointer-events:none;
+            box-shadow:
+                    0 0 10px var(--purple),
+                    0 0 30px rgba(168,85,255,.5);
+            transition:
+                    width .15s,
+                    height .15s,
+                    border-color .15s;
+        }
+
+        #cursorDot{
+            position:fixed;
+            z-index:10001;
+            width:4px;
+            height:4px;
+            border-radius:50%;
+            background:#fff;
+            transform:translate(-50%,-50%);
+            pointer-events:none;
+            box-shadow:0 0 15px #fff;
+        }
+
+        .cursor-big #cursor{
+            width:55px;
+            height:55px;
+            border-color:var(--pink);
+        }
+
+        .cursor-big #cursorDot{
+            box-shadow:
+                    0 0 20px var(--pink),
+                    0 0 40px var(--pink);
+        }
+
+        /* =========================================================
+           NAVIGATION
+           ========================================================= */
+
+        .nav{
+            position:fixed;
+            z-index:9000;
+            top:0;
+            left:0;
+            right:0;
+            height:78px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 5%;
+            background:
+                    linear-gradient(
+                            180deg,
+                            rgba(2,1,6,.88),
+                            rgba(2,1,6,.15)
+                    );
+            backdrop-filter:blur(15px);
+            border-bottom:1px solid rgba(255,255,255,.04);
+        }
+
+        .brand{
+            font-family:"Cinzel",serif;
+            font-size:21px;
+            font-weight:900;
+            letter-spacing:5px;
+        }
+
+        .brand span{
+            color:var(--purple);
+            text-shadow:0 0 25px var(--purple);
+        }
+
+        .nav-right{
+            display:flex;
+            align-items:center;
+            gap:20px;
+        }
+
+        .online{
+            color:#6f667a;
+            font-size:9px;
+            letter-spacing:3px;
+        }
+
+        .online i{
+            display:inline-block;
+            width:7px;
+            height:7px;
+            margin-left:7px;
+            border-radius:50%;
+            background:#43ff9a;
+            box-shadow:0 0 15px #43ff9a;
+            animation:onlinePulse 1.5s infinite;
+        }
+
+        #levelText{
+            color:#b87aff;
+            font-family:"Cinzel",serif;
+            font-size:10px;
+            letter-spacing:2px;
+        }
+
+        /* =========================================================
+           HUD
+           ========================================================= */
+
+        .hud{
+            position:fixed;
+            z-index:8000;
+            left:28px;
+            bottom:28px;
+            width:230px;
+            padding:15px;
+            border:1px solid var(--line);
+            background:rgba(4,2,10,.65);
+            backdrop-filter:blur(16px);
+            box-shadow:0 15px 60px rgba(0,0,0,.3);
+        }
+
+        .hud-title{
+            font-family:"Cinzel",serif;
+            font-size:10px;
+            color:#a978c8;
+            letter-spacing:3px;
+            margin-bottom:10px;
+        }
+
+        .stat{
+            margin-top:8px;
+        }
+
+        .stat-top{
+            display:flex;
+            justify-content:space-between;
+            color:#81768d;
+            font-size:8px;
+            letter-spacing:2px;
+        }
+
+        .stat-bar{
+            height:4px;
+            margin-top:5px;
+            background:rgba(255,255,255,.06);
+            overflow:hidden;
+        }
+
+        .stat-fill{
+            height:100%;
+            width:0;
+            transition:width .25s;
+        }
+
+        #manaFill{
+            background:linear-gradient(90deg,#35eaff,#a855ff);
+            box-shadow:0 0 12px #a855ff;
+        }
+
+        #xpFill{
+            background:linear-gradient(90deg,#ff237f,#ffd166);
+            box-shadow:0 0 12px #ff237f;
+        }
+
+        /* =========================================================
+           GENERAL
+           ========================================================= */
+
+        .section{
+            position:relative;
+            z-index:10;
+            min-height:100vh;
+            scroll-snap-align:start;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:120px 7%;
+        }
+
+        .container{
+            width:min(1200px,100%);
+        }
+
+        .eyebrow{
+            font-family:"Cinzel",serif;
+            color:#ad72dd;
+            font-size:10px;
+            letter-spacing:7px;
+            margin-bottom:20px;
+        }
+
+        .title{
+            font-family:"Cinzel",serif;
+            font-size:clamp(45px,8vw,110px);
+            line-height:.9;
+            font-weight:900;
+            letter-spacing:-5px;
+        }
+
+        .title-outline{
+            color:transparent;
+            -webkit-text-stroke:1px #bd7aff;
+            text-shadow:0 0 40px rgba(168,85,255,.25);
+        }
+
+        .subtitle{
+            color:#77707f;
+            line-height:2;
+            font-size:13px;
+            max-width:650px;
+            margin-top:30px;
+        }
+
+        .en{
+            color:#403947;
+            font-family:"Cinzel",serif;
+            font-size:9px;
+            letter-spacing:4px;
+            margin-top:10px;
+        }
+
+        /* =========================================================
+           HERO
+           ========================================================= */
+
+        .hero{
+            min-height:130vh;
+            position:relative;
+            z-index:10;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            text-align:center;
+            overflow:hidden;
+        }
+
+        .hero-content{
+            position:relative;
+            z-index:20;
+            width:min(1000px,90%);
+        }
+
+        .hero-title{
+            font-family:"Cinzel",serif;
+            font-size:clamp(75px,15vw,190px);
+            line-height:.75;
+            font-weight:900;
+            letter-spacing:-10px;
+            text-shadow:
+                    0 0 35px rgba(168,85,255,.65),
+                    0 0 100px rgba(168,85,255,.25);
+        }
+
+        .hero-title span{
+            color:transparent;
+            -webkit-text-stroke:1px #d397ff;
+        }
+
+        .hero-orb{
+            position:absolute;
+            left:50%;
+            top:50%;
+            width:500px;
+            height:500px;
+            transform:translate(-50%,-50%);
+            border-radius:50%;
+            background:
+                    radial-gradient(
+                            circle,
+                            rgba(168,85,255,.16),
+                            rgba(168,85,255,.04) 45%,
+                            transparent 70%
+                    );
+            filter:blur(1px);
+            z-index:-1;
+        }
+
+        .hero-orb::before,
+        .hero-orb::after{
+            content:"";
+            position:absolute;
+            inset:45px;
+            border:1px solid rgba(168,85,255,.35);
+            border-radius:50%;
+            animation:rotate 14s linear infinite;
+        }
+
+        .hero-orb::after{
+            inset:95px;
+            border-style:dashed;
+            border-color:rgba(53,234,255,.35);
+            animation-direction:reverse;
+            animation-duration:9s;
+        }
+
+        .scroll-label{
+            margin-top:60px;
+            color:#665d70;
+            font-size:9px;
+            letter-spacing:4px;
+            animation:float 2s infinite;
+        }
+
+        /* =========================================================
+           MAGIC CORE
+           ========================================================= */
+
+        .core-section{
+            min-height:140vh;
+        }
+
+        .magic-stage{
+            position:relative;
+            width:620px;
+            max-width:90vw;
+            aspect-ratio:1;
+            margin:60px auto 0;
+        }
+
+        .core-ring{
+            position:absolute;
+            left:50%;
+            top:50%;
+            transform:translate(-50%,-50%);
+            border-radius:50%;
+            border:1px solid;
+            pointer-events:none;
+        }
+
+        .core-ring.r1{
+            width:95%;
+            height:95%;
+            border-color:rgba(168,85,255,.25);
+            box-shadow:
+                    0 0 30px rgba(168,85,255,.1);
+            animation:rotate 20s linear infinite;
+        }
+
+        .core-ring.r2{
+            width:78%;
+            height:78%;
+            border-color:rgba(53,234,255,.28);
+            border-style:dashed;
+            animation:rotateReverse 13s linear infinite;
+        }
+
+        .core-ring.r3{
+            width:61%;
+            height:61%;
+            border-color:rgba(255,35,127,.35);
+            animation:rotate 8s linear infinite;
+        }
+
+        .core-ring.r4{
+            width:43%;
+            height:43%;
+            border-color:rgba(255,209,102,.35);
+            border-style:dotted;
+            animation:rotateReverse 5s linear infinite;
+        }
+
+        .core-ring.r5{
+            width:27%;
+            height:27%;
+            border-color:#fff;
+            box-shadow:
+                    0 0 35px #a855ff,
+                    inset 0 0 25px #a855ff;
+            animation:corePulse 2s infinite;
+        }
+
+        .core-orb{
+            position:absolute;
+            left:50%;
+            top:50%;
+            width:125px;
+            height:125px;
+            transform:translate(-50%,-50%);
+            border-radius:50%;
+            background:
+                    radial-gradient(
+                            circle at 35% 25%,
+                            #fff 0 2%,
+                            #e4baff 6%,
+                            #a855ff 18%,
+                            #5b10b8 42%,
+                            #150024 68%,
+                            #000 75%
+                    );
+            box-shadow:
+                    0 0 30px #a855ff,
+                    0 0 90px #7b21d5,
+                    0 0 180px rgba(168,85,255,.35);
+            animation:orbFloat 3s infinite;
+        }
+
+        .core-orb::before{
+            content:"";
+            position:absolute;
+            inset:-35px;
+            border-radius:50%;
+            border:1px solid rgba(255,255,255,.12);
+            box-shadow:
+                    0 0 35px rgba(168,85,255,.25);
+        }
+
+        /* =========================================================
+           RUNES
+           ========================================================= */
+
+        .rune{
+            position:absolute;
+            color:#c48bff;
+            font-family:"Cinzel",serif;
+            text-shadow:
+                    0 0 15px #a855ff,
+                    0 0 30px #a855ff;
+            z-index:5;
+            animation:runeFloat 3s ease-in-out infinite;
+        }
+
+        .rune:nth-child(1){
+            left:50%;
+            top:0;
+            transform:translateX(-50%);
+        }
+
+        .rune:nth-child(2){
+            right:2%;
+            top:50%;
+        }
+
+        .rune:nth-child(3){
+            left:50%;
+            bottom:0;
+            transform:translateX(-50%);
+        }
+
+        .rune:nth-child(4){
+            left:2%;
+            top:50%;
+        }
+
+        .rune:nth-child(5){
+            right:18%;
+            top:16%;
+        }
+
+        .rune:nth-child(6){
+            left:18%;
+            top:16%;
+        }
+
+        .rune:nth-child(7){
+            right:18%;
+            bottom:16%;
+        }
+
+        .rune:nth-child(8){
+            left:18%;
+            bottom:16%;
+        }
+
+        /* =========================================================
+           SPELL GRID
+           ========================================================= */
+
+        .spell-grid{
+            display:grid;
+            grid-template-columns:repeat(4,1fr);
+            gap:12px;
+            margin-top:50px;
+        }
+
+        .spell{
+            min-height:190px;
+            position:relative;
+            overflow:hidden;
+            padding:25px;
+            border:1px solid var(--line);
+            background:
+                    linear-gradient(
+                            145deg,
+                            rgba(168,85,255,.08),
+                            rgba(0,0,0,.18)
+                    );
+            transition:.4s;
+        }
+
+        .spell:hover{
+            transform:translateY(-10px);
+            border-color:rgba(168,85,255,.5);
+            box-shadow:
+                    0 25px 70px rgba(168,85,255,.14);
+        }
+
+        .spell-icon{
+            font-size:30px;
+            color:#b976ff;
+            text-shadow:0 0 25px #a855ff;
+        }
+
+        .spell h3{
+            font-family:"Cinzel",serif;
+            font-size:15px;
+            margin-top:20px;
+        }
+
+        .spell p{
+            color:#665f6e;
+            font-size:10px;
+            line-height:1.8;
+            margin-top:10px;
+        }
+
+        .spell button{
+            margin-top:15px;
+            border:1px solid rgba(168,85,255,.3);
+            background:rgba(168,85,255,.08);
+            color:#d5b0ff;
+            padding:8px 14px;
+            font-family:inherit;
+            cursor:pointer;
+        }
+
+        /* =========================================================
+           VOID SECTION
+           ========================================================= */
+
+        .void-zone{
+            position:relative;
+            width:100%;
+            height:600px;
+            overflow:hidden;
+            border:1px solid rgba(168,85,255,.12);
+            background:
+                    radial-gradient(
+                            circle at center,
+                            rgba(168,85,255,.08),
+                            transparent 50%
+                    );
+        }
+
+        .black-hole{
+            position:absolute;
+            left:50%;
+            top:50%;
+            width:180px;
+            height:180px;
+            transform:translate(-50%,-50%);
+            border-radius:50%;
+            background:#000;
+            box-shadow:
+                    0 0 40px #000,
+                    0 0 80px #7b21d5,
+                    0 0 150px rgba(168,85,255,.4);
+        }
+
+        .black-hole::before{
+            content:"";
+            position:absolute;
+            inset:-70px;
+            border:2px solid transparent;
+            border-top-color:#ff237f;
+            border-bottom-color:#35eaff;
+            border-radius:50%;
+            animation:rotate 3s linear infinite;
+        }
+
+        .black-hole::after{
+            content:"";
+            position:absolute;
+            inset:-115px;
+            border:1px dashed rgba(168,85,255,.5);
+            border-radius:50%;
+            animation:rotateReverse 7s linear infinite;
+        }
+
+        /* =========================================================
+           METEOR SECTION
+           ========================================================= */
+
+        .meteor-zone{
+            height:600px;
+            position:relative;
+            overflow:hidden;
+            border:1px solid rgba(255,209,102,.1);
+            background:
+                    radial-gradient(
+                            circle at 75% 20%,
+                            rgba(255,209,102,.06),
+                            transparent 30%
+                    );
+        }
+
+        .meteor{
+            position:absolute;
+            width:8px;
+            height:180px;
+            border-radius:50%;
+            background:
+                    linear-gradient(
+                            180deg,
+                            #fff,
+                            #ffd166,
+                            transparent
+                    );
+            filter:
+                    drop-shadow(0 0 20px #ffd166);
+            transform:rotate(45deg);
+            animation:meteorMove 4s linear infinite;
+        }
+
+        .meteor.m1{
+            left:15%;
+            top:-200px;
+        }
+
+        .meteor.m2{
+            left:45%;
+            top:-400px;
+            animation-delay:1.3s;
+        }
+
+        .meteor.m3{
+            left:80%;
+            top:-300px;
+            animation-delay:2.4s;
+        }
+
+        /* =========================================================
+           DRAGON
+           ========================================================= */
+
+        .dragon-zone{
+            height:650px;
+            position:relative;
+            overflow:hidden;
+            border:1px solid rgba(255,35,127,.12);
+        }
+
+        .dragon{
+            position:absolute;
+            left:50%;
+            top:50%;
+            width:230px;
+            height:130px;
+            transform:translate(-50%,-50%);
+            filter:
+                    drop-shadow(0 0 25px #ff237f);
+        }
+
+        .dragon-body{
+            position:absolute;
+            left:35px;
+            top:35px;
+            width:160px;
+            height:65px;
+            border-radius:60% 45% 50% 50%;
+            background:
+                    linear-gradient(
+                            90deg,
+                            #26002e,
+                            #b30b58,
+                            #26002e
+                    );
+            box-shadow:
+                    inset 0 0 25px #ff237f;
+        }
+
+        .dragon-head{
+            position:absolute;
+            right:0;
+            top:15px;
+            width:75px;
+            height:65px;
+            border-radius:50%;
+            background:#420039;
+        }
+
+        .dragon-eye{
+            position:absolute;
+            right:15px;
+            top:20px;
+            width:10px;
+            height:10px;
+            border-radius:50%;
+            background:#fff;
+            box-shadow:0 0 15px #ff237f;
+        }
+
+        .wing{
+            position:absolute;
+            width:120px;
+            height:110px;
+            border:2px solid rgba(255,35,127,.6);
+            background:rgba(255,35,127,.04);
+            clip-path:polygon(50% 0,100% 100%,0 70%);
+        }
+
+        .wing.left{
+            left:10px;
+            top:-60px;
+            transform:rotate(-20deg);
+        }
+
+        .wing.right{
+            right:15px;
+            top:-65px;
+            transform:scaleX(-1) rotate(-20deg);
+        }
+
+        /* =========================================================
+           ACHIEVEMENTS
+           ========================================================= */
+
+        .achievement-grid{
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            gap:12px;
+            margin-top:50px;
+        }
+
+        .achievement{
+            padding:25px;
+            min-height:150px;
+            border:1px solid rgba(255,255,255,.07);
+            background:rgba(255,255,255,.025);
+            opacity:.45;
+            transition:.5s;
+        }
+
+        .achievement.unlocked{
+            opacity:1;
+            border-color:rgba(168,85,255,.45);
+            box-shadow:0 0 35px rgba(168,85,255,.1);
+        }
+
+        .achievement strong{
+            font-family:"Cinzel",serif;
+            color:#d3a0ff;
+        }
+
+        .achievement p{
+            color:#625a69;
+            font-size:10px;
+            margin-top:10px;
+        }
+
+        /* =========================================================
+           TERMINAL
+           ========================================================= */
+
+        .terminal{
+            background:#030305;
+            border:1px solid rgba(53,234,255,.18);
+            box-shadow:
+                    0 30px 100px rgba(0,0,0,.5);
+            padding:25px;
+            min-height:420px;
+            font-family:monospace;
+        }
+
+        .terminal-head{
+            display:flex;
+            gap:7px;
+            margin-bottom:25px;
+        }
+
+        .terminal-head i{
+            width:8px;
+            height:8px;
+            border-radius:50%;
+            background:#ff315c;
+        }
+
+        .terminal-head i:nth-child(2){
+            background:#ffd166;
+        }
+
+        .terminal-head i:nth-child(3){
+            background:#43ff9a;
+        }
+
+        #terminalText{
+            color:#64f4ff;
+            font-size:12px;
+            line-height:2;
+            white-space:pre-wrap;
+        }
+
+        /* =========================================================
+           FINAL
+           ========================================================= */
+
+        .final{
+            min-height:120vh;
+            text-align:center;
+        }
+
+        .final-title{
+            font-family:"Cinzel",serif;
+            font-size:clamp(55px,12vw,160px);
+            color:transparent;
+            -webkit-text-stroke:1px #bd7aff;
+            text-shadow:
+                    0 0 50px rgba(168,85,255,.3);
+        }
+
+        .final button{
+            margin-top:45px;
+            padding:15px 35px;
+            border:1px solid rgba(168,85,255,.5);
+            color:#fff;
+            background:
+                    linear-gradient(
+                            90deg,
+                            rgba(168,85,255,.15),
+                            rgba(255,35,127,.12)
+                    );
+            cursor:pointer;
+            font-family:inherit;
+            transition:.3s;
+        }
+
+        .final button:hover{
+            transform:scale(1.05);
+            box-shadow:0 0 50px rgba(168,85,255,.3);
+        }
+
+        /* =========================================================
+           TOAST
+           ========================================================= */
+
+        #toast{
+            position:fixed;
+            z-index:12000;
+            left:50%;
+            top:105px;
+            transform:translateX(-50%) translateY(-20px);
+            opacity:0;
+            padding:12px 25px;
+            background:rgba(5,2,12,.9);
+            border:1px solid rgba(168,85,255,.35);
+            color:#d6adff;
+            font-size:10px;
+            letter-spacing:2px;
+            backdrop-filter:blur(15px);
+            pointer-events:none;
+            transition:.4s;
+        }
+
+        #toast.show{
+            opacity:1;
+            transform:translateX(-50%) translateY(0);
+        }
+
+        /* =========================================================
+           EFFECTS
+           ========================================================= */
+
+        .shockwave{
+            position:fixed;
+            z-index:7000;
+            width:20px;
+            height:20px;
+            border:2px solid var(--purple);
+            border-radius:50%;
+            transform:translate(-50%,-50%);
+            pointer-events:none;
+            animation:shock .9s ease-out forwards;
+        }
+
+        .lightning{
+            position:fixed;
+            z-index:6500;
+            width:3px;
+            background:linear-gradient(
+                    180deg,
+                    transparent,
+                    #fff,
+                    var(--cyan),
+                    transparent
+            );
+            box-shadow:
+                    0 0 15px var(--cyan),
+                    0 0 35px var(--cyan);
+            pointer-events:none;
+            transform-origin:top;
+            animation:lightning .35s forwards;
+        }
+
+        .flash{
+            position:fixed;
+            inset:0;
+            z-index:11000;
+            background:#fff;
+            opacity:0;
+            pointer-events:none;
+        }
+
+        /* =========================================================
+           KEYFRAMES
+           ========================================================= */
+
+        @keyframes rotate{
+            to{
+                transform:
+                        translate(-50%,-50%)
+                        rotate(360deg);
+            }
+        }
+
+        @keyframes rotateReverse{
+            to{
+                transform:
+                        translate(-50%,-50%)
+                        rotate(-360deg);
+            }
+        }
+
+        @keyframes corePulse{
+            50%{
+                transform:
+                        translate(-50%,-50%)
+                        scale(1.15);
+            }
+        }
+
+        @keyframes orbFloat{
+            50%{
+                transform:
+                        translate(-50%,-50%)
+                        scale(1.08)
+                        translateY(-8px);
+            }
+        }
+
+        @keyframes runeFloat{
+            50%{
+                filter:brightness(1.6);
+                text-shadow:
+                        0 0 25px #a855ff;
+            }
+        }
+
+        @keyframes float{
+            50%{
+                transform:translateY(10px);
+            }
+        }
+
+        @keyframes onlinePulse{
+            50%{
+                opacity:.3;
+            }
+        }
+
+        @keyframes shock{
+            to{
+                width:900px;
+                height:900px;
+                opacity:0;
+                border-width:1px;
+            }
+        }
+
+        @keyframes lightning{
+            to{
+                opacity:0;
+                transform:
+                        scaleY(1.4)
+                        rotate(4deg);
+            }
+        }
+
+        @keyframes meteorMove{
+            0%{
+                transform:
+                        translate(-200px,-200px)
+                        rotate(45deg);
+                opacity:0;
+            }
+            15%{
+                opacity:1;
+            }
+            100%{
+                transform:
+                        translate(900px,900px)
+                        rotate(45deg);
+                opacity:0;
+            }
+        }
+
+        /* =========================================================
+           MOBILE
+           ========================================================= */
+
+        @media(max-width:800px){
+
+            body{
+                cursor:auto;
+            }
+
+            #cursor,
+            #cursorDot{
+                display:none;
+            }
+
+            .nav{
+                padding:0 20px;
+            }
+
+            .online{
+                display:none;
+            }
+
+            .hud{
+                left:12px;
+                bottom:12px;
+                width:190px;
+                transform:scale(.8);
+                transform-origin:bottom left;
+            }
+
+            .spell-grid{
+                grid-template-columns:1fr 1fr;
+            }
+
+            .achievement-grid{
+                grid-template-columns:1fr;
+            }
+
+            .magic-stage{
+                width:90vw;
+            }
+
+            .hero{
+                min-height:110vh;
+            }
+
+            .section{
+                padding:100px 6%;
+            }
+        }
+
+        @media(max-width:480px){
+
+            .spell-grid{
+                grid-template-columns:1fr;
+            }
+
+            .title{
+                letter-spacing:-2px;
+            }
+
+            .hero-title{
+                letter-spacing:-5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="progress"></div>
+
+<canvas id="stars"></canvas>
+<canvas id="space"></canvas>
+<canvas id="particles"></canvas>
+<canvas id="effects"></canvas>
+
+<div id="cursor"></div>
+<div id="cursorDot"></div>
+
+<div class="nav">
+    <div class="brand">
+        BLACK <span>MAGE</span>
+    </div>
+
+    <div class="nav-right">
+        <div id="levelText">LEVEL 01</div>
+
+        <div class="online">
+            <i></i>
+            ARCANE SYSTEM ONLINE
+        </div>
+    </div>
+</div>
+
+<div class="hud">
+
+    <div class="hud-title">
+        ARCANE HUD
+    </div>
+
+    <div class="stat">
+        <div class="stat-top">
+            <span>MANA</span>
+            <span id="manaText">100%</span>
+        </div>
+
+        <div class="stat-bar">
+            <div
+                    class="stat-fill"
+                    id="manaFill"
+            ></div>
+        </div>
+    </div>
+
+    <div class="stat">
+        <div class="stat-top">
+            <span>EXPERIENCE</span>
+            <span id="xpText">0%</span>
+        </div>
+
+        <div class="stat-bar">
+            <div
+                    class="stat-fill"
+                    id="xpFill"
+            ></div>
+        </div>
+    </div>
+
+</div>
+
+<div id="toast"></div>
+<div class="flash" id="flash"></div>
+
+
+<!-- ========================================================
+     HERO
+========================================================= -->
+
+<section class="hero">
+
+    <div class="hero-orb" id="heroOrb"></div>
+
+    <div class="hero-content">
+
+        <div class="eyebrow">
+            FORBIDDEN ARCANE ENGINE
+        </div>
+
+        <h1 class="hero-title">
+            جادوگر
+            <br>
+            <span>سیاه</span>
+        </h1>
+
+        <p class="subtitle" style="margin:35px auto 0">
+            یک جهان جادویی تعاملی که با حرکت،
+            کلیک و اسکرول تو تغییر می‌کند.
+        </p>
+
+        <div class="en">
+            ENTER THE INFINITE ARCANE
+        </div>
+
+        <div class="scroll-label">
+            ↓ &nbsp; SCROLL INTO THE VOID &nbsp; ↓
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================
+     CORE
+========================================================= -->
+
+<section class="section core-section">
+
+    <div class="container">
+
+        <div class="eyebrow">
+            01 / ARCANE CORE
+        </div>
+
+        <h2 class="title">
+            هسته‌ی
+            <span class="title-outline">
+                جادو
+            </span>
+        </h2>
+
+        <p class="subtitle">
+            اسکرول کن. با تغییر موقعیت صفحه،
+            جهان جادویی نیز واکنش نشان می‌دهد.
+            روی هسته کلیک کن و انرژی جمع کن.
+        </p>
+
+        <div class="magic-stage" id="magicStage">
+
+            <div class="core-ring r1"></div>
+            <div class="core-ring r2"></div>
+            <div class="core-ring r3"></div>
+            <div class="core-ring r4"></div>
+            <div class="core-ring r5"></div>
+
+            <div class="rune">☽</div>
+            <div class="rune">✦</div>
+            <div class="rune">◇</div>
+            <div class="rune">☼</div>
+            <div class="rune">∆</div>
+            <div class="rune">∞</div>
+            <div class="rune">◈</div>
+            <div class="rune">Ω</div>
+
+            <div
+                    class="core-orb"
+                    id="coreOrb"
+            ></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================
+     SPELLS
+========================================================= -->
+
+<section class="section">
+
+    <div class="container">
+
+        <div class="eyebrow">
+            02 / SPELL ARCHIVE
+        </div>
+
+        <h2 class="title">
+            کتابخانه‌ی
+            <span class="title-outline">
+                طلسم‌ها
+            </span>
+        </h2>
+
+        <p class="subtitle">
+            هر طلسم یک رفتار متفاوت دارد.
+            بعضی طلسم‌ها با مقدار Mana و XP باز می‌شوند.
+        </p>
+
+        <div class="spell-grid">
+
+            <div class="spell">
+
+                <div class="spell-icon">⚡</div>
+
+                <h3>
+                    VOID LIGHTNING
+                </h3>
+
+                <p>
+                    باران انرژی الکتریکی
+                    در اطراف نشانگر.
+                </p>
+
+                <button onclick="castLightning()">
+                    CAST
+                </button>
+
+            </div>
+
+            <div class="spell">
+
+                <div class="spell-icon">🕳</div>
+
+                <h3>
+                    BLACK HOLE
+                </h3>
+
+                <p>
+                    یک میدان گرانشی
+                    جادویی ایجاد می‌کند.
+                </p>
+
+                <button onclick="blackHoleEvent()">
+                    OPEN
+                </button>
+
+            </div>
+
+            <div class="spell">
+
+                <div class="spell-icon">☄</div>
+
+                <h3>
+                    METEOR
+                </h3>
+
+                <p>
+                    آسمان را برای
+                    بارش شهاب فعال می‌کند.
+                </p>
+
+                <button onclick="meteorEvent()">
+                    SUMMON
+                </button>
+
+            </div>
+
+            <div class="spell">
+
+                <div class="spell-icon">◈</div>
+
+                <h3>
+                    REALITY BREAK
+                </h3>
+
+                <p>
+                    برای لحظه‌ای قوانین
+                    جهان را تغییر می‌دهد.
+                </p>
+
+                <button onclick="realityBreak()">
+                    BREAK
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================
+     VOID
+========================================================= -->
+
+<section class="section">
+
+    <div class="container">
+
+        <div class="eyebrow">
+            03 / SINGULARITY
+        </div>
+
+        <h2 class="title">
+            قلب
+            <span class="title-outline">
+                خلأ
+            </span>
+        </h2>
+
+        <p class="subtitle">
+            نزدیک سیاه‌چاله حرکت کن.
+            ذرات جهان به سمت آن کشیده می‌شوند.
+        </p>
+
+        <div class="void-zone">
+
+            <div
+                    class="black-hole"
+                    id="blackHole"
+            ></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================
+     METEOR
+========================================================= -->
+
+<section class="section">
+
+    <div class="container">
+
+        <div class="eyebrow">
+            04 / CELESTIAL EVENT
+        </div>
+
+        <h2 class="title">
+            خشم
+            <span class="title-outline">
+                آسمان
+            </span>
+        </h2>
+
+        <p class="subtitle">
+            گاهی جهان خودش طلسم اجرا می‌کند.
+        </p>
+
+        <div class="meteor-zone">
+
+            <div class="meteor m1"></div>
+            <div class="meteor m2"></div>
+            <div class="meteor m3"></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================
+     DRAGON
+========================================================= -->
+
+<section class="section">
+
+    <div class="container">
+
+        <div class="eyebrow">
+            05 / ANCIENT ENTITY
+        </div>
+
+        <h2 class="title">
+            اژدهای
+            <span class="title-outline">
+                خلأ
+            </span>
+        </h2>
+
+        <p class="subtitle">
+            موجودی که فقط در سطح انرژی بالا ظاهر می‌شود.
+        </p>
+
+        <div class="dragon-zone">
+
+            <div class="dragon">
+
+                <div class="wing left"></div>
+                <div class="wing right"></div>
+
+                <div class="dragon-body"></div>
+
+                <div class="dragon-head">
+                    <div class="dragon-eye"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================
+     ACHIEVEMENTS
+========================================================= -->
+
+<section class="section">
+
+    <div class="container">
+
+        <div class="eyebrow">
+            06 / ARCHIVE
+        </div>
+
+        <h2 class="title">
+            افتخارات
+        </h2>
+
+        <p class="subtitle">
+            با تعامل با جهان، Achievementهای مخفی را باز کن.
+        </p>
+
+        <div class="achievement-grid">
+
+            <div
+                    class="achievement"
+                    id="ach1"
+            >
+                <strong>
+                    FIRST SPELL
+                </strong>
+
+                <p>
+                    اولین طلسم خود را اجرا کن.
+                </p>
+            </div>
+
+            <div
+                    class="achievement"
+                    id="ach2"
+            >
+                <strong>
+                    VOID WALKER
+                </strong>
+
+                <p>
+                    وارد قلب خلأ شو.
+                </p>
+            </div>
+
+            <div
+                    class="achievement"
+                    id="ach3"
+            >
+                <strong>
+                    REALITY BREAKER
+                </strong>
+
+                <p>
+                    Reality Break را فعال کن.
+                </p>
+            </div>
+
+            <div
+                    class="achievement"
+                    id="ach4"
+            >
+                <strong>
+                    METEOR LORD
+                </strong>
+
+                <p>
+                    بارش شهاب را احضار کن.
+                </p>
+            </div>
+
+            <div
+                    class="achievement"
+                    id="ach5"
+            >
+                <strong>
+                    BLACK GOD
+                </strong>
+
+                <p>
+                    طلسم نهایی را اجرا کن.
+                </p>
+            </div>
+
+            <div
+                    class="achievement"
+                    id="ach6"
+            >
+                <strong>
+                    ETERNAL
+                </strong>
+
+                <p>
+                    تمام جهان را کشف کن.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================
+     TERMINAL
+========================================================= -->
+
+<section class="section">
+
+    <div class="container">
+
+        <div class="eyebrow">
+            07 / ARCANE TERMINAL
+        </div>
+
+        <h2 class="title">
+            سیستم
+            <span class="title-outline">
+                جادو
+            </span>
+        </h2>
+
+        <div class="terminal">
+
+            <div class="terminal-head">
+                <i></i>
+                <i></i>
+                <i></i>
+            </div>
+
+            <div id="terminalText"></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================
+     FINAL
+========================================================= -->
+
+<section class="section final">
+
+    <div class="container">
+
+        <div class="eyebrow">
+            08 / THE END
+        </div>
+
+        <h2 class="final-title">
+            BLACK MAGE
+        </h2>
+
+        <p class="subtitle" style="margin:30px auto">
+            پایان وجود ندارد.
+            فقط طلسم‌های قوی‌تر وجود دارند.
+        </p>
+
+        <button onclick="ultimateSpell()">
+            ☠ AWAKEN THE BLACK GOD
+        </button>
+
+    </div>
+
+</section>
+
+
+<script>
+
+    /* =========================================================
+       GLOBAL STATE
+    ========================================================= */
+
+    const state = {
+
+        mouseX:innerWidth/2,
+
+        mouseY:innerHeight/2,
+
+        scroll:0,
+
+        scrollProgress:0,
+
+        mana:100,
+
+        xp:0,
+
+        level:1,
+
+        combo:0,
+
+        spells:0,
+
+        frozen:false,
+
+        blackHole:false,
+
+        chaos:false,
+
+        ultimate:false,
+
+        touch:false
+
+    };
+
+
+    /* =========================================================
+       CANVAS SETUP
+    ========================================================= */
+
+    const starsCanvas =
+        document.getElementById("stars");
+
+    const spaceCanvas =
+        document.getElementById("space");
+
+    const particlesCanvas =
+        document.getElementById("particles");
+
+    const effectsCanvas =
+        document.getElementById("effects");
+
+    const starsCtx =
+        starsCanvas.getContext("2d");
+
+    const spaceCtx =
+        spaceCanvas.getContext("2d");
+
+    const particlesCtx =
+        particlesCanvas.getContext("2d");
+
+    const effectsCtx =
+        effectsCanvas.getContext("2d");
+
+
+    function resizeCanvases(){
+
+        starsCanvas.width=innerWidth;
+        starsCanvas.height=innerHeight;
+
+        spaceCanvas.width=innerWidth;
+        spaceCanvas.height=innerHeight;
+
+        particlesCanvas.width=innerWidth;
+        particlesCanvas.height=innerHeight;
+
+        effectsCanvas.width=innerWidth;
+        effectsCanvas.height=innerHeight;
+
+    }
+
+    resizeCanvases();
+
+    window.addEventListener(
+        "resize",
+        resizeCanvases
+    );
+
+
+    /* =========================================================
+       STAR FIELD
+    ========================================================= */
+
+    const stars=[];
+
+    for(
+        let i=0;
+        i<700;
+        i++
+    ){
+
+        stars.push({
+
+            x:Math.random()*innerWidth,
+
+            y:Math.random()*innerHeight,
+
+            size:
+                Math.random()*2+.2,
+
+            depth:
+                Math.random()*4+1,
+
+            alpha:
+                Math.random()*.8+.2
+
+        });
+
+    }
+
+
+    function drawStars(){
+
+        starsCtx.clearRect(
+            0,
+            0,
+            innerWidth,
+            innerHeight
+        );
+
+        for(
+            const star of stars
+            ){
+
+            if(!state.frozen){
+
+                star.y +=
+                    star.depth *
+                    .08;
+
+            }
+
+            if(
+                star.y >
+                innerHeight
+            ){
+
+                star.y=0;
+
+            }
+
+            const parallaxX=
+                (state.mouseX-innerWidth/2)
+                *star.depth*.001;
+
+            const parallaxY=
+                (state.mouseY-innerHeight/2)
+                *star.depth*.001;
+
+            starsCtx.beginPath();
+
+            starsCtx.arc(
+                star.x+parallaxX,
+                star.y+parallaxY,
+                star.size,
+                0,
+                Math.PI*2
+            );
+
+            starsCtx.fillStyle=
+                `rgba(
+                215,
+                185,
+                255,
+                ${star.alpha}
+            )`;
+
+            starsCtx.fill();
+
+        }
+
+        requestAnimationFrame(
+            drawStars
+        );
+
+    }
+
+    drawStars();
+
+
+    /* =========================================================
+       SPACE DUST
+    ========================================================= */
+
+    const dust=[];
+
+    for(
+        let i=0;
+        i<250;
+        i++
+    ){
+
+        dust.push({
+
+            x:Math.random()*innerWidth,
+
+            y:Math.random()*innerHeight,
+
+            radius:Math.random()*80+10,
+
+            speed:Math.random()*.4+.1,
+
+            phase:Math.random()*Math.PI*2
+
+        });
+
+    }
+
+
+    function drawSpace(){
+
+        spaceCtx.clearRect(
+            0,
+            0,
+            innerWidth,
+            innerHeight
+        );
+
+        for(
+            const d of dust
+            ){
+
+            if(!state.frozen){
+
+                d.phase+=.005;
+
+            }
+
+            const x=
+                d.x+
+                Math.sin(d.phase)*
+                d.radius+
+                (state.mouseX-innerWidth/2)*.02;
+
+            const y=
+                d.y+
+                Math.cos(d.phase*.8)*
+                d.radius+
+                state.scrollProgress*200;
+
+            spaceCtx.beginPath();
+
+            spaceCtx.arc(
+                x,
+                y%innerHeight,
+                1,
+                0,
+                Math.PI*2
+            );
+
+            spaceCtx.fillStyle=
+                "rgba(130,70,190,.18)";
+
+            spaceCtx.fill();
+
+        }
+
+        requestAnimationFrame(
+            drawSpace
+        );
+
+    }
+
+    drawSpace();
+
+
+    /* =========================================================
+       PARTICLE ENGINE
+    ========================================================= */
+
+    let particles=[];
+
+
+    function createParticle(
+        x,
+        y,
+        color,
+        amount=1,
+        power=3,
+        gravity=.02
+    ){
+
+        for(
+            let i=0;
+            i<amount;
+            i++
+        ){
+
+            const angle=
+                Math.random()*
+                Math.PI*2;
+
+            const speed=
+                Math.random()*
+                power;
+
+            particles.push({
+
+                x:x,
+
+                y:y,
+
+                vx:
+                    Math.cos(angle)*
+                    speed,
+
+                vy:
+                    Math.sin(angle)*
+                    speed,
+
+                life:1,
+
+                decay:
+                    Math.random()*.012+
+                    .006,
+
+                size:
+                    Math.random()*3+
+                    .5,
+
+                color:color,
+
+                gravity:gravity,
+
+                rotation:
+                    Math.random()*Math.PI*2
+
+            });
+
+        }
+
+    }
+
+
+    function updateParticles(){
+
+        particlesCtx.clearRect(
+            0,
+            0,
+            innerWidth,
+            innerHeight
+        );
+
+        for(
+            const p of particles
+            ){
+
+            if(!state.frozen){
+
+                p.x+=p.vx;
+
+                p.y+=p.vy;
+
+                p.vy+=p.gravity;
+
+                p.vx*=.992;
+
+                p.vy*=.992;
+
+                p.life-=p.decay;
+
+                p.rotation+=.03;
+
+            }
+
+            particlesCtx.globalAlpha=
+                Math.max(
+                    0,
+                    p.life
+                );
+
+            particlesCtx.save();
+
+            particlesCtx.translate(
+                p.x,
+                p.y
+            );
+
+            particlesCtx.rotate(
+                p.rotation
+            );
+
+            particlesCtx.fillStyle=
+                p.color;
+
+            particlesCtx.shadowBlur=
+                18;
+
+            particlesCtx.shadowColor=
+                p.color;
+
+            particlesCtx.fillRect(
+                -p.size/2,
+                -p.size/2,
+                p.size,
+                p.size
+            );
+
+            particlesCtx.restore();
+
+        }
+
+        particlesCtx.globalAlpha=1;
+
+        particles=
+            particles.filter(
+                p=>p.life>0
+            );
+
+        requestAnimationFrame(
+            updateParticles
+        );
+
+    }
+
+    updateParticles();
+
+
+    /* =========================================================
+       EFFECT PARTICLES
+    ========================================================= */
+
+    function magicBurst(
+        x,
+        y,
+        colors=[
+            "#a855ff",
+            "#35eaff",
+            "#ff237f"
+        ],
+        amount=150
+    ){
+
+        for(
+            let i=0;
+            i<amount;
+            i++
+        ){
+
+            createParticle(
+                x,
+                y,
+                colors[
+                    Math.floor(
+                        Math.random()*
+                        colors.length
+                    )
+                    ],
+                1,
+                Math.random()*15+3,
+                .035
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       CURSOR
+    ========================================================= */
+
+    const cursor=
+        document.getElementById(
+            "cursor"
+        );
+
+    const cursorDot=
+        document.getElementById(
+            "cursorDot"
+        );
+
+
+    document.addEventListener(
+        "mousemove",
+        event=>{
+
+            state.mouseX=
+                event.clientX;
+
+            state.mouseY=
+                event.clientY;
+
+            cursor.style.left=
+                state.mouseX+"px";
+
+            cursor.style.top=
+                state.mouseY+"px";
+
+            cursorDot.style.left=
+                state.mouseX+"px";
+
+            cursorDot.style.top=
+                state.mouseY+"px";
+
+            if(
+                Math.random()<.5
+            ){
+
+                createParticle(
+                    state.mouseX,
+                    state.mouseY,
+                    Math.random()>.5
+                        ?"#a855ff"
+                        :"#35eaff",
+                    1,
+                    1.8,
+                    0
+                );
+
+            }
+
+        }
+    );
+
+
+    /* =========================================================
+       CURSOR INTERACTION
+    ========================================================= */
+
+    document.addEventListener(
+        "mousedown",
+        ()=>{
+
+            document.body.classList.add(
+                "cursor-big"
+            );
+
+            magicBurst(
+                state.mouseX,
+                state.mouseY,
+                ["#a855ff","#fff"],
+                25
+            );
+
+        }
+    );
+
+    document.addEventListener(
+        "mouseup",
+        ()=>{
+
+            document.body.classList.remove(
+                "cursor-big"
+            );
+
+        }
+    );
+
+
+    /* =========================================================
+       SCROLL ENGINE
+    ========================================================= */
+
+    window.addEventListener(
+        "scroll",
+        ()=>{
+
+            state.scroll=
+                window.scrollY;
+
+            const max=
+                document.documentElement
+                    .scrollHeight-
+                innerHeight;
+
+            state.scrollProgress=
+                max>0
+                    ?state.scroll/max
+                    :0;
+
+            document.getElementById(
+                "progress"
+            ).style.height=
+                state.scrollProgress*100+
+                "%";
+
+            scrollWorld();
+
+        },
+        {passive:true}
+    );
+
+
+    /* =========================================================
+       SCROLL WORLD
+    ========================================================= */
+
+    function scrollWorld(){
+
+        const orb=
+            document.getElementById(
+                "heroOrb"
+            );
+
+        const core=
+            document.getElementById(
+                "coreOrb"
+            );
+
+        const amount=
+            state.scrollProgress;
+
+        if(orb){
+
+            orb.style.transform=
+                `
+            translate(-50%,-50%)
+            rotate(${amount*360}deg)
+            scale(${1+amount*.7})
+            `;
+
+        }
+
+        if(core){
+
+            core.style.transform=
+                `
+            translate(-50%,-50%)
+            rotate(${amount*720}deg)
+            scale(${1+amount*.15})
+            `;
+
+        }
+
+        document.documentElement
+            .style.setProperty(
+            "--scrollHue",
+            Math.floor(amount*180)
+        );
+
+        if(
+            Math.random()<
+            .15
+        ){
+
+            createParticle(
+                Math.random()*innerWidth,
+                innerHeight,
+                "#a855ff",
+                3,
+                2,
+                -.01
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       XP SYSTEM
+    ========================================================= */
+
+    function gainXP(
+        amount
+    ){
+
+        state.xp+=amount;
+
+        if(
+            state.xp>=100
+        ){
+
+            state.xp-=100;
+
+            state.level++;
+
+            showToast(
+                "LEVEL UP — LEVEL "+
+                state.level
+            );
+
+            magicBurst(
+                innerWidth/2,
+                innerHeight/2,
+                ["#ffd166","#a855ff"],
+                250
+            );
+
+        }
+
+        updateHUD();
+
+    }
+
+
+    function useMana(
+        amount
+    ){
+
+        if(
+            state.mana<
+            amount
+        ){
+
+            showToast(
+                "MANA INSUFFICIENT"
+            );
+
+            return false;
+
+        }
+
+        state.mana-=amount;
+
+        updateHUD();
+
+        return true;
+
+    }
+
+
+    function regenerateMana(){
+
+        if(
+            !state.frozen
+        ){
+
+            state.mana+=.05;
+
+            if(
+                state.mana>100
+            ){
+
+                state.mana=100;
+
+            }
+
+            updateHUD();
+
+        }
+
+        requestAnimationFrame(
+            regenerateMana
+        );
+
+    }
+
+    regenerateMana();
+
+
+    /* =========================================================
+       HUD UPDATE
+    ========================================================= */
+
+    function updateHUD(){
+
+        document.getElementById(
+            "manaFill"
+        ).style.width=
+            state.mana+"%";
+
+        document.getElementById(
+            "manaText"
+        ).textContent=
+            Math.floor(
+                state.mana
+            )+"%";
+
+        document.getElementById(
+            "xpFill"
+        ).style.width=
+            state.xp+"%";
+
+        document.getElementById(
+            "xpText"
+        ).textContent=
+            Math.floor(
+                state.xp
+            )+"%";
+
+        document.getElementById(
+            "levelText"
+        ).textContent=
+            "LEVEL "+
+            String(
+                state.level
+            ).padStart(
+                2,
+                "0"
+            );
+
+    }
+
+
+    /* =========================================================
+       SPELL CAST
+    ========================================================= */
+
+    function spellCast(
+        cost=10
+    ){
+
+        if(
+            !useMana(cost)
+        ){
+
+            return false;
+
+        }
+
+        state.spells++;
+
+        state.combo++;
+
+        gainXP(
+            cost/2
+        );
+
+        unlock(
+            "ach1"
+        );
+
+        return true;
+
+    }
+
+
+    /* =========================================================
+       SHOCKWAVE
+    ========================================================= */
+
+    function shockwave(
+        x,
+        y,
+        color="#a855ff"
+    ){
+
+        const element=
+            document.createElement(
+                "div"
+            );
+
+        element.className=
+            "shockwave";
+
+        element.style.left=
+            x+"px";
+
+        element.style.top=
+            y+"px";
+
+        element.style.borderColor=
+            color;
+
+        document.body.appendChild(
+            element
+        );
+
+        setTimeout(
+            ()=>{
+                element.remove();
+            },
+            950
+        );
+
+    }
+
+
+    /* =========================================================
+       FLASH
+    ========================================================= */
+
+    function flashScreen(
+        color="#ffffff",
+        duration=500
+    ){
+
+        const flash=
+            document.getElementById(
+                "flash"
+            );
+
+        flash.style.background=
+            color;
+
+        flash.animate(
+            [
+                {
+                    opacity:.85
+                },
+                {
+                    opacity:0
+                }
+            ],
+            {
+                duration:duration
+            }
+        );
+
+    }
+
+
+    /* =========================================================
+       TOAST
+    ========================================================= */
+
+    let toastTimer;
+
+    function showToast(
+        text
+    ){
+
+        const toast=
+            document.getElementById(
+                "toast"
+            );
+
+        toast.textContent=
+            text;
+
+        toast.classList.add(
+            "show"
+        );
+
+        clearTimeout(
+            toastTimer
+        );
+
+        toastTimer=
+            setTimeout(
+                ()=>{
+                    toast.classList.remove(
+                        "show"
+                    );
+                },
+                2200
+            );
+
+    }
+
+
+    /* =========================================================
+       LIGHTNING SPELL
+    ========================================================= */
+
+    function castLightning(){
+
+        if(
+            !spellCast(12)
+        ){
+
+            return;
+
+        }
+
+        showToast(
+            "VOID LIGHTNING"
+        );
+
+        for(
+            let i=0;
+            i<15;
+            i++
+        ){
+
+            setTimeout(
+                ()=>{
+
+                    const x=
+                        Math.random()*
+                        innerWidth;
+
+                    const y=
+                        Math.random()*
+                        innerHeight;
+
+                    lightning(
+                        x,
+                        y
+                    );
+
+                    magicBurst(
+                        x,
+                        y,
+                        [
+                            "#35eaff",
+                            "#a855ff",
+                            "#ffffff"
+                        ],
+                        20
+                    );
+
+                },
+                i*60
+            );
+
+        }
+
+        unlock(
+            "ach1"
+        );
+
+    }
+
+
+    /* =========================================================
+       LIGHTNING VISUAL
+    ========================================================= */
+
+    function lightning(
+        x,
+        y
+    ){
+
+        const bolt=
+            document.createElement(
+                "div"
+            );
+
+        bolt.className=
+            "lightning";
+
+        const length=
+            Math.random()*500+
+            150;
+
+        bolt.style.height=
+            length+"px";
+
+        bolt.style.left=
+            x+"px";
+
+        bolt.style.top=
+            y+"px";
+
+        bolt.style.transform=
+            `
+        rotate(
+            ${Math.random()*50-25}deg
+        )
+        `;
+
+        document.body.appendChild(
+            bolt
+        );
+
+        setTimeout(
+            ()=>{
+                bolt.remove();
+            },
+            400
+        );
+
+    }
+
+
+    /* =========================================================
+       BLACK HOLE
+    ========================================================= */
+
+    function blackHoleEvent(){
+
+        if(
+            !spellCast(25)
+        ){
+
+            return;
+
+        }
+
+        state.blackHole=true;
+
+        unlock(
+            "ach2"
+        );
+
+        showToast(
+            "VOID SINGULARITY"
+        );
+
+        const hole=
+            document.getElementById(
+                "blackHole"
+            );
+
+        hole.animate(
+            [
+                {
+                    transform:
+                        "translate(-50%,-50%) scale(.4)"
+                },
+                {
+                    transform:
+                        "translate(-50%,-50%) scale(1.4)"
+                },
+                {
+                    transform:
+                        "translate(-50%,-50%) scale(1)"
+                }
+            ],
+            {
+                duration:1000
+            }
+        );
+
+        for(
+            let i=0;
+            i<700;
+            i++
+        ){
+
+            const angle=
+                Math.random()*
+                Math.PI*2;
+
+            const radius=
+                Math.random()*
+                550+
+                100;
+
+            const x=
+                innerWidth/2+
+                Math.cos(angle)*
+                radius;
+
+            const y=
+                innerHeight/2+
+                Math.sin(angle)*
+                radius;
+
+            createParticle(
+                x,
+                y,
+                "#a855ff",
+                1,
+                0,
+                0
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       METEOR
+    ========================================================= */
+
+    function meteorEvent(){
+
+        if(
+            !spellCast(18)
+        ){
+
+            return;
+
+        }
+
+        unlock(
+            "ach4"
+        );
+
+        showToast(
+            "METEOR RAIN"
+        );
+
+        for(
+            let i=0;
+            i<20;
+            i++
+        ){
+
+            setTimeout(
+                ()=>{
+
+                    const x=
+                        Math.random()*
+                        innerWidth;
+
+                    const y=
+                        -100;
+
+                    meteor(
+                        x,
+                        y
+                    );
+
+                },
+                i*120
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       METEOR VISUAL
+    ========================================================= */
+
+    function meteor(
+        x,
+        y
+    ){
+
+        const m=
+            document.createElement(
+                "div"
+            );
+
+        m.style.position=
+            "fixed";
+
+        m.style.zIndex=
+            "6500";
+
+        m.style.left=
+            x+"px";
+
+        m.style.top=
+            y+"px";
+
+        m.style.width=
+            "7px";
+
+        m.style.height=
+            "160px";
+
+        m.style.borderRadius=
+            "50%";
+
+        m.style.background=
+            `
+        linear-gradient(
+            180deg,
+            #fff,
+            #ffd166,
+            transparent
+        )
+        `;
+
+        m.style.boxShadow=
+            "0 0 30px #ffd166";
+
+        m.style.transform=
+            "rotate(40deg)";
+
+        m.style.pointerEvents=
+            "none";
+
+        document.body.appendChild(
+            m
+        );
+
+        m.animate(
+            [
+                {
+                    transform:
+                        "translate(-150px,-150px) rotate(40deg)",
+                    opacity:0
+                },
+                {
+                    opacity:1
+                },
+                {
+                    transform:
+                        "translate(1000px,900px) rotate(40deg)",
+                    opacity:0
+                }
+            ],
+            {
+                duration:
+                    Math.random()*1000+
+                    1000,
+                easing:
+                    "cubic-bezier(.2,.7,.4,1)"
+            }
+        ).onfinish=
+            ()=>{
+                m.remove();
+            };
+
+    }
+
+
+    /* =========================================================
+       REALITY BREAK
+    ========================================================= */
+
+    function realityBreak(){
+
+        if(
+            !spellCast(35)
+        ){
+
+            return;
+
+        }
+
+        unlock(
+            "ach3"
+        );
+
+        showToast(
+            "REALITY BREAK"
+        );
+
+        document.body.animate(
+            [
+                {
+                    filter:
+                        "hue-rotate(0deg) contrast(1)"
+                },
+                {
+                    filter:
+                        "hue-rotate(180deg) contrast(1.7)"
+                },
+                {
+                    filter:
+                        "hue-rotate(-100deg) contrast(.8)"
+                },
+                {
+                    filter:
+                        "hue-rotate(0deg) contrast(1)"
+                }
+            ],
+            {
+                duration:1600
+            }
+        );
+
+        flashScreen(
+            "#d7b0ff",
+            700
+        );
+
+        for(
+            let i=0;
+            i<12;
+            i++
+        ){
+
+            setTimeout(
+                ()=>{
+
+                    shockwave(
+                        Math.random()*
+                        innerWidth,
+
+                        Math.random()*
+                        innerHeight,
+
+                        i%2
+                            ?"#ff237f"
+                            :"#35eaff"
+                    );
+
+                },
+                i*80
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       ULTIMATE
+    ========================================================= */
+
+    function ultimateSpell(){
+
+        if(
+            !spellCast(60)
+        ){
+
+            return;
+
+        }
+
+        state.ultimate=true;
+
+        unlock(
+            "ach5"
+        );
+
+        unlock(
+            "ach6"
+        );
+
+        showToast(
+            "BLACK GOD AWAKENED"
+        );
+
+        flashScreen(
+            "#ffffff",
+            1000
+        );
+
+        magicBurst(
+            innerWidth/2,
+            innerHeight/2,
+            [
+                "#ffffff",
+                "#a855ff",
+                "#ff237f",
+                "#35eaff",
+                "#ffd166"
+            ],
+            1800
+        );
+
+        for(
+            let i=0;
+            i<25;
+            i++
+        ){
+
+            setTimeout(
+                ()=>{
+
+                    shockwave(
+                        innerWidth/2,
+                        innerHeight/2,
+
+                        [
+                            "#a855ff",
+                            "#ff237f",
+                            "#35eaff",
+                            "#ffd166"
+                        ][
+                        i%4
+                            ]
+
+                    );
+
+                },
+                i*70
+            );
+
+        }
+
+        document.body.animate(
+            [
+                {
+                    transform:"scale(1)"
+                },
+                {
+                    transform:"scale(1.015)"
+                },
+                {
+                    transform:"scale(1)"
+                }
+            ],
+            {
+                duration:1600
+            }
+        );
+
+    }
+
+
+    /* =========================================================
+       ACHIEVEMENTS
+    ========================================================= */
+
+    function unlock(
+        id
+    ){
+
+        const item=
+            document.getElementById(
+                id
+            );
+
+        if(
+            !item
+        ){
+
+            return;
+
+        }
+
+        if(
+            !item.classList.contains(
+                "unlocked"
+            )
+        ){
+
+            item.classList.add(
+                "unlocked"
+            );
+
+            magicBurst(
+                innerWidth/2,
+                innerHeight/2,
+                [
+                    "#ffd166",
+                    "#a855ff"
+                ],
+                80
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       CORE CLICK
+    ========================================================= */
+
+    document.getElementById(
+        "coreOrb"
+    ).addEventListener(
+        "click",
+        event=>{
+
+            event.stopPropagation();
+
+            if(
+                !spellCast(5)
+            ){
+
+                return;
+
+            }
+
+            magicBurst(
+                event.clientX,
+                event.clientY,
+                [
+                    "#a855ff",
+                    "#35eaff",
+                    "#ffffff"
+                ],
+                100
+            );
+
+            shockwave(
+                event.clientX,
+                event.clientY,
+                "#a855ff"
+            );
+
+        }
+    );
+
+
+    /* =========================================================
+       DOUBLE CLICK
+    ========================================================= */
+
+    document.addEventListener(
+        "dblclick",
+        event=>{
+
+            if(
+                !spellCast(15)
+            ){
+
+                return;
+
+            }
+
+            showToast(
+                "DOUBLE ARCANE"
+            );
+
+            for(
+                let i=0;
+                i<4;
+                i++
+            ){
+
+                setTimeout(
+                    ()=>{
+
+                        shockwave(
+                            event.clientX,
+                            event.clientY,
+                            i%2
+                                ?"#35eaff"
+                                :"#ff237f"
+                        );
+
+                    },
+                    i*120
+                );
+
+            }
+
+        }
+    );
+
+
+    /* =========================================================
+       RIGHT CLICK
+    ========================================================= */
+
+    document.addEventListener(
+        "contextmenu",
+        event=>{
+
+            event.preventDefault();
+
+            if(
+                !spellCast(8)
+            ){
+
+                return;
+
+            }
+
+            showToast(
+                "CHAOS RUNE"
+            );
+
+            magicBurst(
+                event.clientX,
+                event.clientY,
+                [
+                    "#ff237f",
+                    "#a855ff"
+                ],
+                180
+            );
+
+        }
+    );
+
+
+    /* =========================================================
+       KEYBOARD SPELLS
+    ========================================================= */
+
+    let secretBuffer="";
+
+    document.addEventListener(
+        "keydown",
+        event=>{
+
+            const key=
+                event.key.toLowerCase();
+
+            secretBuffer+=key;
+
+            if(
+                secretBuffer.length>30
+            ){
+
+                secretBuffer=
+                    secretBuffer.slice(
+                        -30
+                    );
+
+            }
+
+            if(
+                key==="f"
+            ){
+
+                toggleFreeze();
+
+            }
+
+            if(
+                key==="b"
+            ){
+
+                blackHoleEvent();
+
+            }
+
+            if(
+                key==="m"
+            ){
+
+                meteorEvent();
+
+            }
+
+            if(
+                key==="r"
+            ){
+
+                realityBreak();
+
+            }
+
+            if(
+                key==="u"
+            ){
+
+                ultimateSpell();
+
+            }
+
+            if(
+                secretBuffer.includes(
+                    "godmode"
+                )
+            ){
+
+                ultimateSpell();
+
+                secretBuffer="";
+
+            }
+
+            if(
+                secretBuffer.includes(
+                    "void"
+                )
+            ){
+
+                blackHoleEvent();
+
+                secretBuffer="";
+
+            }
+
+        }
+    );
+
+
+    /* =========================================================
+       FREEZE TIME
+    ========================================================= */
+
+    function toggleFreeze(){
+
+        state.frozen=
+            !state.frozen;
+
+        if(
+            state.frozen
+        ){
+
+            showToast(
+                "TIME FROZEN"
+            );
+
+            document.querySelectorAll(
+                ".core-ring,.core-orb,.rune"
+            ).forEach(
+                element=>{
+                    element.style.animationPlayState=
+                        "paused";
+                }
+            );
+
+        }
+        else{
+
+            showToast(
+                "TIME RESUMED"
+            );
+
+            document.querySelectorAll(
+                ".core-ring,.core-orb,.rune"
+            ).forEach(
+                element=>{
+                    element.style.animationPlayState=
+                        "running";
+                }
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       TERMINAL
+    ========================================================= */
+
+    const terminalLines=[
+
+        "[SYSTEM] BLACK MAGE CORE INITIALIZED",
+
+        "[SYSTEM] ARCANE PARTICLE ENGINE: ONLINE",
+
+        "[SYSTEM] VOID FIELD: STABLE",
+
+        "[SYSTEM] CELESTIAL EVENTS: ENABLED",
+
+        "[SYSTEM] REALITY LAYER: UNSTABLE",
+
+        "[SYSTEM] MANA REACTOR: ONLINE",
+
+        "[SYSTEM] SPELL ARCHIVE: LOADED",
+
+        "[SYSTEM] UNKNOWN ENTITY: OBSERVING",
+
+        "[SYSTEM] SCROLL ENGINE: ACTIVE",
+
+        "[SYSTEM] WAITING FOR MAGE INPUT..."
+
+    ];
+
+    let terminalIndex=0;
+    let terminalChar=0;
+
+    const terminalText=
+        document.getElementById(
+            "terminalText"
+        );
+
+
+    function terminalType(){
+
+        if(
+            terminalIndex>=
+            terminalLines.length
+        ){
+
+            terminalIndex=0;
+
+            terminalText.textContent="";
+
+        }
+
+        const line=
+            terminalLines[
+                terminalIndex
+                ];
+
+        if(
+            terminalChar<
+            line.length
+        ){
+
+            terminalText.textContent+=
+                line[
+                    terminalChar
+                    ];
+
+            terminalChar++;
+
+            setTimeout(
+                terminalType,
+                20
+            );
+
+        }
+        else{
+
+            terminalText.textContent+=
+                "\n";
+
+            terminalIndex++;
+
+            terminalChar=0;
+
+            setTimeout(
+                terminalType,
+                400
+            );
+
+        }
+
+    }
+
+    terminalType();
+
+
+    /* =========================================================
+       RANDOM ARCANE EVENTS
+    ========================================================= */
+
+    setInterval(
+        ()=>{
+
+            if(
+                Math.random()<.08
+            ){
+
+                const eventType=
+                    Math.floor(
+                        Math.random()*5
+                    );
+
+                if(
+                    eventType===0
+                ){
+
+                    showToast(
+                        "AN ARCANE PRESENCE IS WATCHING"
+                    );
+
+                }
+
+                if(
+                    eventType===1
+                ){
+
+                    magicBurst(
+                        Math.random()*innerWidth,
+                        Math.random()*innerHeight,
+                        ["#a855ff"],
+                        60
+                    );
+
+                }
+
+                if(
+                    eventType===2
+                ){
+
+                    lightning(
+                        Math.random()*innerWidth,
+                        Math.random()*innerHeight
+                    );
+
+                }
+
+                if(
+                    eventType===3
+                ){
+
+                    createParticle(
+                        innerWidth/2,
+                        innerHeight/2,
+                        "#ffd166",
+                        50,
+                        8
+                    );
+
+                }
+
+                if(
+                    eventType===4
+                ){
+
+                    showToast(
+                        "RARE ARCANE EVENT"
+                    );
+
+                }
+
+            }
+
+        },
+        3000
+    );
+
+
+    /* =========================================================
+       TOUCH
+    ========================================================= */
+
+    document.addEventListener(
+        "touchstart",
+        event=>{
+
+            state.touch=true;
+
+            const touch=
+                event.touches[0];
+
+            state.mouseX=
+                touch.clientX;
+
+            state.mouseY=
+                touch.clientY;
+
+            magicBurst(
+                state.mouseX,
+                state.mouseY,
+                [
+                    "#a855ff",
+                    "#35eaff"
+                ],
+                50
+            );
+
+        },
+        {
+            passive:true
+        }
+    );
+
+
+    document.addEventListener(
+        "touchmove",
+        event=>{
+
+            const touch=
+                event.touches[0];
+
+            state.mouseX=
+                touch.clientX;
+
+            state.mouseY=
+                touch.clientY;
+
+            createParticle(
+                state.mouseX,
+                state.mouseY,
+                "#a855ff",
+                5,
+                3,
+                0
+            );
+
+        },
+        {
+            passive:true
+        }
+    );
+
+
+    /* =========================================================
+       PARALLAX ELEMENTS
+    ========================================================= */
+
+    window.addEventListener(
+        "scroll",
+        ()=>{
+
+            const elements=
+                document.querySelectorAll(
+                    ".rune,.hero-orb,.dragon"
+                );
+
+            elements.forEach(
+                (element,index)=>{
+
+                    const speed=
+                        (index%5+1)*.08;
+
+                    element.style.translate=
+                        `0 ${state.scroll*speed}px`;
+
+                }
+            );
+
+        },
+        {
+            passive:true
+        }
+    );
+
+
+    /* =========================================================
+       AUTO ENERGY
+    ========================================================= */
+
+    let energyTick=0;
+
+    function energyLoop(){
+
+        energyTick+=.01;
+
+        if(
+            !state.frozen
+        ){
+
+            const x=
+                innerWidth/2+
+                Math.cos(
+                    energyTick
+                )*160;
+
+            const y=
+                innerHeight/2+
+                Math.sin(
+                    energyTick*1.7
+                )*160;
+
+            if(
+                Math.random()<.7
+            ){
+
+                createParticle(
+                    x,
+                    y,
+                    "#a855ff",
+                    1,
+                    .8,
+                    0
+                );
+
+            }
+
+        }
+
+        requestAnimationFrame(
+            energyLoop
+        );
+
+    }
+
+    energyLoop();
+
+
+    /* =========================================================
+       RARE DRAGON EVENT
+    ========================================================= */
+
+    let dragonEnergy=0;
+
+    setInterval(
+        ()=>{
+
+            dragonEnergy+=
+                state.spells;
+
+            if(
+                dragonEnergy>100
+            ){
+
+                dragonEnergy=0;
+
+                showToast(
+                    "THE VOID DRAGON STIRS"
+                );
+
+                const dragon=
+                    document.querySelector(
+                        ".dragon"
+                    );
+
+                dragon.animate(
+                    [
+                        {
+                            transform:
+                                "translate(-50%,-50%) scale(.7) rotate(-8deg)",
+                            opacity:.1
+                        },
+                        {
+                            transform:
+                                "translate(-50%,-50%) scale(1.15) rotate(8deg)",
+                            opacity:1
+                        },
+                        {
+                            transform:
+                                "translate(-50%,-50%) scale(1) rotate(0)",
+                            opacity:.85
+                        }
+                    ],
+                    {
+                        duration:2500
+                    }
+                );
+
+                magicBurst(
+                    innerWidth/2,
+                    innerHeight/2,
+                    [
+                        "#ff237f",
+                        "#a855ff"
+                    ],
+                    350
+                );
+
+            }
+
+        },
+        1000
+    );
+
+
+    /* =========================================================
+       INITIAL HUD
+    ========================================================= */
+
+    updateHUD();
+
+
+    /* =========================================================
+       INITIAL PARTICLE FIELD
+    ========================================================= */
+
+    for(
+        let i=0;
+        i<250;
+        i++
+    ){
+
+        createParticle(
+            Math.random()*innerWidth,
+            Math.random()*innerHeight,
+            Math.random()>.5
+                ?"#a855ff"
+                :"#35eaff",
+            1,
+            .5,
+            0
+        );
+
+    }
+
+
+    /* =========================================================
+       EASTER EGG
+    ========================================================= */
+
+    let clickCount=0;
+
+    document.addEventListener(
+        "click",
+        ()=>{
+
+            clickCount++;
+
+            if(
+                clickCount===13
+            ){
+
+                showToast(
+                    "13TH CLICK — FORBIDDEN SPELL"
+                );
+
+                magicBurst(
+                    innerWidth/2,
+                    innerHeight/2,
+                    [
+                        "#ff237f",
+                        "#ffffff"
+                    ],
+                    500
+                );
+
+                clickCount=0;
+
+            }
+
+        }
+    );
+
+
+    /* =========================================================
+       MOUSE GRAVITY
+    ========================================================= */
+
+    function mouseGravity(){
+
+        if(
+            !state.frozen &&
+            particles.length
+        ){
+
+            for(
+                const p of particles
+                ){
+
+                const dx=
+                    state.mouseX-p.x;
+
+                const dy=
+                    state.mouseY-p.y;
+
+                const distance=
+                    Math.sqrt(
+                        dx*dx+
+                        dy*dy
+                    );
+
+                if(
+                    distance<180 &&
+                    distance>10
+                ){
+
+                    const force=
+                        .015;
+
+                    p.vx+=
+                        dx/distance*
+                        force;
+
+                    p.vy+=
+                        dy/distance*
+                        force;
+
+                }
+
+            }
+
+        }
+
+        requestAnimationFrame(
+            mouseGravity
+        );
+
+    }
+
+    mouseGravity();
+
+
+    /* =========================================================
+       SCROLL-BASED MAGIC
+    ========================================================= */
+
+    let previousScroll=0;
+
+    window.addEventListener(
+        "scroll",
+        ()=>{
+
+            const difference=
+                Math.abs(
+                    state.scroll-
+                    previousScroll
+                );
+
+            if(
+                difference>20
+            ){
+
+                createParticle(
+                    state.mouseX,
+                    state.mouseY,
+                    "#a855ff",
+                    Math.min(
+                        10,
+                        Math.floor(
+                            difference/10
+                        )
+                    ),
+                    3,
+                    -.01
+                );
+
+            }
+
+            previousScroll=
+                state.scroll;
+
+        },
+        {
+            passive:true
+        }
+    );
+
+
+    /* =========================================================
+       ENDLESS BACKGROUND ENERGY
+    ========================================================= */
+
+    let waveTime=0;
+
+    function waveEngine(){
+
+        waveTime+=.01;
+
+        effectsCtx.clearRect(
+            0,
+            0,
+            innerWidth,
+            innerHeight
+        );
+
+        const centerX=
+            innerWidth/2;
+
+        const centerY=
+            innerHeight/2;
+
+        for(
+            let i=0;
+            i<5;
+            i++
+        ){
+
+            const radius=
+                100+
+                i*70+
+                Math.sin(
+                    waveTime+i
+                )*10;
+
+            effectsCtx.beginPath();
+
+            effectsCtx.arc(
+                centerX,
+                centerY,
+                radius,
+                0,
+                Math.PI*2
+            );
+
+            effectsCtx.strokeStyle=
+                `rgba(
+                168,
+                85,
+                255,
+                ${.025}
+            )`;
+
+            effectsCtx.lineWidth=1;
+
+            effectsCtx.stroke();
+
+        }
+
+        requestAnimationFrame(
+            waveEngine
+        );
+
+    }
+
+    waveEngine();
+
+
+    /* =========================================================
+       FINAL READY MESSAGE
+    ========================================================= */
+
+    setTimeout(
+        ()=>{
+            showToast(
+                "BLACK MAGE ONLINE"
+            );
+        },
+        800
+    );
+
+</script>
+
+</body>
+</html>
+
+</body>
+</html>
